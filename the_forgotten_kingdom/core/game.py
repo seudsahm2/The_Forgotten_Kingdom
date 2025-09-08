@@ -3,12 +3,41 @@ from .npc import NPC
 from .item import Item
 from .player import Player
 from .enemy import Enemy
+from .boss import ShadowDragon
+
+from ..scenes.village import Village
+from ..scenes.forest import Forest
+from ..scenes.dragon_lair import DragonLair
 
 class Game:
     def __init__(self):
         self.player: Player | None = None
-        self.npc: NPC | None = None
-        self.started: bool = False
+        self.scenes = {
+            "village": Village(),
+            "forest": Forest(),
+            "dragon_lair": DragonLair()
+        }
+        self.current_scene = "village"
+        
+    def play(self):
+        while self.current_scene != "end":
+            scene = self.scenes.get(self.current_scene)
+
+            if not scene:
+                print("Unknown scene. Game over.")
+                break
+
+            result = scene.enter(self.player)
+
+            if isinstance(result, tuple) and result[0] == "battle":
+                enemy = result[1]
+                self.battle(self.player, enemy)
+                if not self.player.is_alive():
+                    self.game_over()
+                    break
+                self.current_scene = "forest" if enemy.name != "Shadow Dragon" else "end"
+            else:
+                self.current_scene = result
         
     def start(self) -> None:
         if self.started:
@@ -51,24 +80,65 @@ class Game:
     def forest(self):
         pass
     
-    def dragon_lair(self):
-        pass
+    def meet_npc(self, player):
+        healer = NPC(
+            "Wise Healer",
+            dialogue=[
+                "The Shadow Dragon grows stronger every night...",
+                "Take care of your wounds, brave warrior.",
+                "Potions are your best friend in dark times."
+            ],
+            trade_items=[Item("Potion", "heal", 30), Item("Elixir", "heal", 50)]
+        )
+
+        healer.talk()
+        healer.trade(player)
     
     def battle(self,player:Player,enemy:Enemy):
-        print(f"\n-- Battle starts: {player.name} vs {enemy.name} -- \n")
+        
+        print(f"\nA wild {enemy.name} appears!")
+        
         while player.is_alive() and enemy.is_alive():
-            player.attack_enemy(enemy)
-            if not enemy.is_alive():
-                print(f"{enemy.name} is defeated\n")
-                break
+            print("\nYour turn")
+            print("1. Atatck")
+            print("2.Use Item")
+            choice = input("choose acion:").strip()
             
-            enemy.attack_player(player)
-            if not player.is_alive():
-                print(f"{player.name} has fallen...")
-                break
+            if choice == "1":
+                player.attack_enemy(enemy)
+            elif choice == "2":
+                item_name = input("Enter item name to use:").strip()
+                if not player.use_item(item_name):
+                    continue
+            else:
+                print("Invalid choice try again")
+                continue
+            
+            if enemy.is_alive():
+                enemy.attack_player(player)
+            
+            
+        if player.is_alive():
+             print(f"You defeated {enemy.name}!")
+             loot = enemy.drop_loot()
+             if loot:
+                 player.add_item(loot)
+        else:
+            self.game_over()
+            
+    def final_battle(self, player):
+        dragon = ShadowDragon()
+        dragon.intro()
+        self.battle(player, dragon)
+
+        if player.is_alive():
+            print("\n🎉 Congratulations! You defeated the Shadow Dragon and restored peace to the kingdom!")
+        else:
+            self.game_over()
     
     def game_over(self):
         pass
     
     def victory(self):
         pass
+    

@@ -1,4 +1,4 @@
-from .item import Item
+
 
 class Player:
     def __init__(self,name: str ="Aria",health: int =100,attack: int =5):
@@ -10,10 +10,12 @@ class Player:
         
     def status(self) -> str:
         return f"{self.name}: HP {self.health}/{self.max_health}, ATK {self.attack}"
+    
+    from .enemy import Enemy    
+    def attack_enemy(self, enemy:Enemy):
         
-    def attack_enemy(self, enemy:"Enemy"):
-        from .enemy import Enemy
         print(f"{self.name} aattacks {enemy.name} for {self.attack} damage")
+        enemy.take_damage(self.attack)
     
     def take_damage(self,amount:int):
         self.health -= amount
@@ -30,6 +32,7 @@ class Player:
     def is_alive(self) -> bool:
         return self.health > 0
     
+    from .item import Item
     def add_item(self,item: Item):
         self.inventory.append(item)
         print(f"{self.name} picks up {item.name}")
@@ -39,5 +42,6 @@ class Player:
             if item.name.lower() == item_name.lower():
                 item.use(self)
                 self.inventory.remove(item)
-                return
+                return True
         print(f"{self.name} does not have a {item_name}")
+        return False
