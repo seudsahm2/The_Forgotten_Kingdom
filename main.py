@@ -1,10 +1,21 @@
 from the_forgotten_kingdom.core.game import Game
-from the_forgotten_kingdom.core.player import Player
 
-game = Game()
-player = Player()
+def main():
+    game = Game()
+    print("--The Forgotten Kingdom--")
+    print("1. New Game")
+    print("2. Load Game")
+    print("3. Quit")
 
-print("\n--- Visiting NPC ---")
-game.meet_npc(player)
+    choice = input("Choose an option: ").strip()
+    if choice == "1":
+        game.start()
+        game.play()
+    elif choice == "2":
+        if game.load():
+            game.play()
+    else:
+        print("Goodbye!")
 
-print("\nInventory after meeting NPC:", [item.name for item in player.inventory])
+if __name__ == "__main__":
+    main()

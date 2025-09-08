@@ -22,7 +22,9 @@ class Village:
             print("2. Trade with Elder")
             print("3. Travel to the Forest")
             print("4. Rest (restore some HP)")
-            print("5. Quit Game")
+            print("5. Save Game")
+            print("6. Load Game")
+            print("7. Quit Game")
 
             choice = input("Choose an action: ").strip()
 
@@ -36,6 +38,27 @@ class Village:
                 player.heal(10)
                 print(f"{player.name} rests and recovers some strength.")
             elif choice == "5":
+                from ..utils import save_game
+                data = {
+                    "player": player.to_dict(),
+                    "current_scene": "village"
+                }
+                save_game(data)
+            elif choice == "6":
+                from ..utils import load_game
+                data = load_game()
+                if data:
+                    from ..core.player import Player
+                    from ..core.item import Item
+                    item_lookup = {
+                        "Potion": Item("Potion", "heal", 20),
+                        "Rusty Sword": Item("Rusty Sword", "attack_boost", 5),
+                    }
+                    player = Player.from_dict(data["player"], item_lookup)
+                    print("✅ Game loaded successfully!")
+                else:
+                    print("⚠️ No save file found.")
+            elif choice == "7":
                 return "end"
             else:
                 print("Invalid choice.")

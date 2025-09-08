@@ -36,3 +36,6 @@ build/
 
 # Jupyter (if used later)
 .ipynb_checkpoints/
+
+# Game save files
+savegame.json

@@ -45,3 +45,23 @@ class Player:
                 return True
         print(f"{self.name} does not have a {item_name}")
         return False
+    
+    def to_dict(self):
+        return {
+            "name": self.name,
+            "health": self.health,
+            "max_health": self.max_health,
+            "attack": self.attack,
+            "inventory": [item.name for item in self.inventory],
+        }
+
+    @classmethod
+    def from_dict(cls, data, item_lookup):
+        player = cls(
+            name=data["name"],
+            health=data["health"],
+            attack=data["attack"]
+        )
+        player.max_health = data["max_health"]
+        player.inventory = [item_lookup[name] for name in data["inventory"]]
+        return player

@@ -13,6 +13,12 @@ class NPC:
         print(f"\n👤 {self.name} says:")
         for line in self.dialogue:
             print(f"  - {line}")
+            
+    def give_item(self, player, item_name="Potion"):
+        # Elder gives a Potion by default
+        item = Item(name="Potion", effect="heal", value=20)
+        player.add_item(item)
+        print(f"{self.name} gives you a {item_name}!")
 
     def trade(self, player):
         """Offer trade items to the player."""

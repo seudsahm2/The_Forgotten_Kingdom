@@ -9,9 +9,14 @@ from ..scenes.village import Village
 from ..scenes.forest import Forest
 from ..scenes.dragon_lair import DragonLair
 
+from ..utils import load_game
+from ..utils import save_game
+
 class Game:
     def __init__(self):
         self.player: Player | None = None
+        self.npc: NPC | None = None
+        self.started: bool = False
         self.scenes = {
             "village": Village(),
             "forest": Forest(),
@@ -53,12 +58,14 @@ class Game:
         self.player = Player(name=name)
         
         self.elder = NPC(
-            name = "Village Elder",
-            dialogue=(
-                "Darkness gathers in the north. Cross the forest and seek the ruined castle. "
+            name="Village Elder",
+            dialogue=[
+                "Darkness gathers in the north.",
+                "Cross the forest and seek the ruined castle.",
                 "There, a Shadow Dragon guards the truth of Elaria."
-            ),
+            ]
         )
+
         
         print(self.elder.dialogue)
         
@@ -68,16 +75,7 @@ class Game:
         
         input("\n[Press ENter to begin your journy...]")
     
-    def village(self):
-        print("\n -- Village --")
-        print(self.elder.talk())
-        
-        potion = Item(name="Small Potion", effect="heal", value=20)
-        self.elder.give_item(self.player,potion)
-        
-        print(f"Inveentory: {[item.name for item in self.player.inventory]}")
-    
-    def forest(self):
+
         pass
     
     def meet_npc(self, player):
@@ -107,9 +105,14 @@ class Game:
             if choice == "1":
                 player.attack_enemy(enemy)
             elif choice == "2":
-                item_name = input("Enter item name to use:").strip()
+                if not player.inventory:
+                    print("⚠️ You have no items!")
+                    continue
+                print("Inventory:", [item.name for item in player.inventory])
+                item_name = input("Enter item name to use: ").strip()
                 if not player.use_item(item_name):
                     continue
+
             else:
                 print("Invalid choice try again")
                 continue
@@ -141,4 +144,27 @@ class Game:
     
     def victory(self):
         pass
+    
+    def save(self):
+        data = {
+            "player": self.player.to_dict(),
+            "current_scene": self.current_scene
+        }
+        save_game(data)
+
+    def load(self):
+        data = load_game()
+        if not data:
+            print("⚠️ No save file found.")
+            return False
+
+        # Rebuild player with item lookup
+        item_lookup = {
+            "Potion": Item("Potion", "heal", 20),
+            "Rusty Sword": Item("Rusty Sword", "attack_boost", 5)
+        }
+        self.player = Player.from_dict(data["player"], item_lookup)
+        self.current_scene = data["current_scene"]
+        print(f"✅ Game loaded. Welcome back, {self.player.name}!")
+        return True
     
