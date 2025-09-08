@@ -1,3 +1,4 @@
+# NPC -> non player character
 class NPC:
     def __init__(self,name: str,dialogue: str):
         self.name = name
