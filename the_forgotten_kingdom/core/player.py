@@ -1,3 +1,5 @@
+from .item import Item
+
 class Player:
     def __init__(self,name: str ="Aria",health: int =100,attack: int =5):
         self.name = name
@@ -9,20 +11,33 @@ class Player:
     def status(self) -> str:
         return f"{self.name}: HP {self.health}/{self.max_health}, ATK {self.attack}"
         
-    def atack_enemy(self, enemy):
-        pass
+    def attack_enemy(self, enemy:"Enemy"):
+        from .enemy import Enemy
+        print(f"{self.name} aattacks {enemy.name} for {self.attack} damage")
     
-    def take_damage(self,amount):
-        pass
+    def take_damage(self,amount:int):
+        self.health -= amount
+        print(f"{self.name} takes {amount} damage! (HP left: {self.health})")
+        if self.health <0:
+            self.health = 0
     
-    def heal(self,maount):
-        pass
+    def heal(self,amount:int):
+        self.health += amount
+        if self.health > self.max_health:
+            self.health = self.max_health
+        print(f"{self.name} heals {amount} HP! (Current HP: {self.health})")
     
     def is_alive(self) -> bool:
         return self.health > 0
     
-    def add_item(self,item):
-        pass
+    def add_item(self,item: Item):
+        self.inventory.append(item)
+        print(f"{self.name} picks up {item.name}")
     
     def use_item(self, item_name):
-        pass
+        for item in self.inventory:
+            if item.name.lower() == item_name.lower():
+                item.use(self)
+                self.inventory.remove(item)
+                return
+        print(f"{self.name} does not have a {item_name}")

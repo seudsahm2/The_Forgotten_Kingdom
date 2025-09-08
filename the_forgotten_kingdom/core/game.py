@@ -1,7 +1,8 @@
-from .player import Player
-from .enemy import Wolf,Bandit,ShadowDragon
-from .item import Item
+
 from .npc import NPC
+from .item import Item
+from .player import Player
+from .enemy import Enemy
 
 class Game:
     def __init__(self):
@@ -39,7 +40,13 @@ class Game:
         input("\n[Press ENter to begin your journy...]")
     
     def village(self):
-        pass
+        print("\n -- Village --")
+        print(self.elder.talk())
+        
+        potion = Item(name="Small Potion", effect="heal", value=20)
+        self.elder.give_item(self.player,potion)
+        
+        print(f"Inveentory: {[item.name for item in self.player.inventory]}")
     
     def forest(self):
         pass
@@ -47,8 +54,18 @@ class Game:
     def dragon_lair(self):
         pass
     
-    def battle(self,player,enemy):
-        pass
+    def battle(self,player:Player,enemy:Enemy):
+        print(f"\n-- Battle starts: {player.name} vs {enemy.name} -- \n")
+        while player.is_alive() and enemy.is_alive():
+            player.attack_enemy(enemy)
+            if not enemy.is_alive():
+                print(f"{enemy.name} is defeated\n")
+                break
+            
+            enemy.attack_player(player)
+            if not player.is_alive():
+                print(f"{player.name} has fallen...")
+                break
     
     def game_over(self):
         pass
