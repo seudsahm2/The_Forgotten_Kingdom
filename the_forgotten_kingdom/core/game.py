@@ -13,7 +13,7 @@ class Game:
         if self.started:
             return
         
-        print("--The Forgotten Kingddom--")
+        print("--The Forgotten Kingdom--")
         print("You awaken in a ruined village under a pale morning sun.\n")
         
         name = input("What is your name travelor? (Press Enter for 'Aria'): ").strip()
@@ -32,7 +32,7 @@ class Game:
         
         print(self.elder.dialogue)
         
-        print("f\nyour current status -- {self.player.status}")
+        print(f"\nyour current status -- {self.player.status()}")
         
         self.started = True
         
